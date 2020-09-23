@@ -38,7 +38,11 @@ def home():
             '<li><a href="/api/v1.0/precipitation">Precipitation</a></li>'
             '<li><a href="/api/v1.0/stations">Stations</a></li>'
             '<li><a href="/api/v1.0/tobs">Temperatures</a></li>'
-            # '<li><a href="/api/v1.0/<">start> and /api/v1.0/<start>/<end></a></li>'
+            '<li>/api/v1.0/"start date"</li>'
+            '<li>/api/v1.0/"start date"/"end date"</li>'
+            # '<li>Start date <input name="start" placeholder="2016-8-23">'
+            # '<li>End date <input name="end" placeholder="2016-9-10">'
+
         '</ul>'
     )
 
@@ -73,7 +77,13 @@ def temps():
 
     return { date:tobs for date,tobs in temps_list }
 
+@app.route('/api/v1.0/<start>')
+@app.route('/api/v1.0/<start>/<end>')
+def startEnd(start,end='2017-08-23'):
 
+    result = session.query(func.min(measurements.tobs),func.max(measurements.tobs),func.avg(measurements.tobs).filter((measurements.date>=start) & (measurements.date <= end))).all()[0]
+
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(debug=True)
